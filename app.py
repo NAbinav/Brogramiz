@@ -15,7 +15,7 @@ templates = Jinja2Templates(directory="templates")
 @app.get("/", response_class=HTMLResponse)
 async def get_editor(request: Request):
     return templates.TemplateResponse(
-        "index.html",
+        "editor.html",
         {
             "request": request,
             "content": "// Start typing your code here...",
