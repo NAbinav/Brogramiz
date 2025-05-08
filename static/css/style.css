@@ -1,0 +1,77 @@
+/* Basic Styling */
+body {
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+    font-family: "Courier New", Courier, monospace;
+    margin: 0;
+}
+
+.total {
+    display: flex;
+    height: 100vh;
+}
+
+.editor-container, .io-container {
+    width: 50%;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.CodeMirror {
+    height: 60vh;
+    font-size: 16px;
+    border: 1px solid white;
+}
+
+textarea[name="input_content"] {
+    height: 15vh;
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+    border: 1px solid white;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 16px;
+    resize: none;
+}
+
+.output-container {
+    min-height: 25vh;
+    height: 100dvh;
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+    border: 1px solid white;
+    padding: 10px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 16px;
+}
+
+button {
+    background-color: #007acc;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #005f8d;
+}
+
+select {
+    font-size: 16px;
+    padding: 5px;
+    background-color: #333;
+    color: #d4d4d4;
+    border: 1px solid white;
+}
+
+label {
+    color: white;
+    font-size: 16px;
+}
+

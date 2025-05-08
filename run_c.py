@@ -1,0 +1,32 @@
+import subprocess
+from pathlib import Path
+
+
+def run_c(input_content, editor_content):
+    temp_dir = Path("/tmp/code_runner")
+    temp_dir.mkdir(parents=True, exist_ok=True)
+    c_path = temp_dir / "main.c"
+    c_path.write_text(editor_content)
+
+    cmd = [
+        "docker",
+        "run",
+        "--rm",
+        "--cpus=0.5",
+        "--memory=256m",
+        "--pids-limit=64",
+        "--read-only",
+        "--network=none",
+        "--cap-drop=ALL",
+        "--security-opt",
+        "no-new-privileges",
+        "-v",
+        f"{temp_dir}:/app:ro",
+        "gcc:latest",
+        "/bin/sh",
+        "-c",
+        "gcc /app/main.c -o /tmp/main.out && /tmp/main.out",
+    ]
+
+    result = subprocess.run(cmd, input=input_content.encode(), capture_output=True)
+    return result.stdout.decode() + result.stderr.decode()
