@@ -29,4 +29,5 @@ Next line(s):"""
     }
 
     result = requests.post(url, json=json_req)
+    a = 10
     return json.loads(result.text)["candidates"][0]["content"]["parts"][0]["text"]
