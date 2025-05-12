@@ -22,7 +22,7 @@ def run_py(input_content, editor_content):
         "--security-opt",
         "no-new-privileges",
         "-v",
-        f"{temp_dir}:/app:ro",  # Mount the temp directory to /app in the container
+        f"{temp_dir}:/app:rw",  # Mount the temp directory to /app in the container
         "-i",  # Interactive mode for stdin
         "python:3.9-slim",  # Use the Python 3.9 slim image
         "python",
