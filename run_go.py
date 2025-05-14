@@ -1,49 +1,41 @@
-import os
 import subprocess
-import tempfile
-import uuid
+import shlex
 
 
-def run_go(input_str: str, code: str):
-    with tempfile.TemporaryDirectory() as tmpdir:
-        src = os.path.join(tmpdir, "main.go")
+def run_go(input_str: str, code: str) -> str:
 
-        # Write Go source
-        with open(src, "w") as f:
-            f.write(code)
+    code_esc = shlex.quote(code)
+    input_esc = shlex.quote(input_str)
+    inner_script = (
+        "mkdir -p /app && "
+        f"printf %s {code_esc} > /app/Main.go && "
+        "export GOMODULE=off && "
+        f"printf %s {input_esc} | go run /app/Main.go"
+    )
 
-        try:
-            cmd = [
-                "docker",
-                "run",
-                "--rm",
-                "-i",
-                "--cpus",
-                "0.5",
-                "--memory",
-                "256m",
-                "--pids-limit",
-                "64",
-                "--network",
-                "none",
-                "--cap-drop",
-                "ALL",
-                "--security-opt",
-                "no-new-privileges",
-                "-v",
-                f"{tmpdir}:/app",
-                "golang:1.22.1",
-                "sh",
-                "-c",
-                "cd /app && go run main.go",
-            ]
-            result = subprocess.run(
-                cmd,
-                input=input_str,
-                capture_output=True,
-                text=True,
-            )
-            return result.stdout + result.stderr
+    cmd = [
+        "docker",
+        "run",
+        "--rm",
+        "-i",
+        "--network=none",
+        "--cap-drop=ALL",
+        "--security-opt=no-new-privileges",
+        # mount a persistent cache directory to reuse compiled packages
+        "-v",
+        "go-build-cache:/go/pkg/mod",
+        "golang:1.20-alpine",
+        "sh",
+        "-c",
+        inner_script,
+    ]
+    try:
+        proc = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+        )
+        return proc.stdout + proc.stderr
 
-        except subprocess.TimeoutExpired:
-            return "[Error] Execution timed out."
+    except subprocess.TimeoutExpired:
+        return "[Error] Execution timed out."

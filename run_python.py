@@ -1,38 +1,38 @@
-# run_py.py
-
-import os
 import subprocess
-import uuid
-
-SHARED_DIR = "/code_exec"  # where FastAPI writes
-EXECUTOR_CONTAINER = "python-executor"
+import shlex
 
 
-def run_py(input_str: str, code: str):
-    file_id = f"{uuid.uuid4()}.py"
-    host_path = os.path.join(SHARED_DIR, file_id)
+def run_py(input_str: str, code: str) -> str:
 
-    # 1) write the user code
-    with open(host_path, "w") as f:
-        f.write(code)
+    code_esc = shlex.quote(code)
+    input_esc = shlex.quote(input_str)
+    inner_script = (
+        "mkdir -p /app && "
+        f"printf %s {code_esc} > /app/main.py && "
+        f"printf %s {input_esc} | python3 /app/main.py"
+    )
+
+    cmd = [
+        "docker",
+        "run",
+        "--rm",
+        "-i",
+        "--network=none",
+        "--cap-drop=ALL",
+        "--security-opt=no-new-privileges",
+        "python:3.9-slim",
+        "sh",
+        "-c",
+        inner_script,
+    ]
 
     try:
-        # 2) exec into python-executor to run it
-        result = subprocess.run(
-            ["docker", "exec", "-i", EXECUTOR_CONTAINER, "python", f"/app/{file_id}"],
-            input=input_str,
+        proc = subprocess.run(
+            cmd,
             capture_output=True,
             text=True,
-            timeout=10,
         )
-        return result.stdout + result.stderr
+        return proc.stdout + proc.stderr
 
     except subprocess.TimeoutExpired:
         return "[Error] Execution timed out."
-
-    finally:
-        # 3) clean up
-        try:
-            os.remove(host_path)
-        except OSError:
-            pass

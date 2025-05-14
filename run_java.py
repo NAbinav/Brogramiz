@@ -1,29 +1,41 @@
 # run_java.py
-import os, subprocess, tempfile
-from pathlib import Path
+import subprocess
+import shlex
 
 
 def run_java(input_str: str, code: str) -> str:
-    with tempfile.TemporaryDirectory() as tmpdir:
-        src = Path(tmpdir) / "Main.java"
-        src.write_text(code)
 
-        cmd = [
-            "docker",
-            "run",
-            "--rm",
-            "-i",
-            "-v",
-            f"{tmpdir}:/app",
-            "openjdk:17-slim",
-            "sh",
-            "-c",
-            "javac /app/Main.java && java -cp /app Main",
-        ]
-        try:
-            res = subprocess.run(
-                cmd, input=input_str, capture_output=True, text=True, timeout=15
-            )
-            return res.stdout + res.stderr
-        except subprocess.TimeoutExpired:
-            return "[Error] Execution timed out."
+    code_esc = shlex.quote(code)
+    input_esc = shlex.quote(input_str)
+
+    inner_script = (
+        "mkdir -p /app && "
+        f"printf %s {code_esc} > /app/Main.java && "
+        "javac /app/Main.java && "
+        f"printf %s {input_esc} |  java -cp /app Main"
+    )
+
+    cmd = [
+        "docker",
+        "run",
+        "--rm",
+        "-i",
+        "--network=none",
+        "--cap-drop=ALL",
+        "--security-opt=no-new-privileges",
+        "openjdk:17-slim",
+        "sh",
+        "-c",
+        inner_script,
+    ]
+
+    try:
+        proc = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+        )
+        return proc.stdout + proc.stderr
+
+    except subprocess.TimeoutExpired:
+        return "[Error] Execution timed out."
