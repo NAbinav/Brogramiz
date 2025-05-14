@@ -5,7 +5,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi import Request
 from run import run
-from gemini import ai_agent
+from line_suggestion import line_ai_agent
+from full_suggestion import full_ai_agent
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -26,12 +27,21 @@ async def get_editor(request: Request):
     )
 
 
-@app.post("/suggest", response_class=PlainTextResponse)
-async def suggest(request: Request):
+@app.post("/line_ai", response_class=PlainTextResponse)
+async def line_ai(request: Request):
     data = await request.json()
     code = data.get("code", "")
     language = data.get("language", "")
-    suggestion = ai_agent(code, language)
+    suggestion = line_ai_agent(code, language)
+    return suggestion.strip()
+
+
+@app.post("/full_ai", response_class=PlainTextResponse)
+async def full_ai(request: Request):
+    data = await request.json()
+    code = data.get("code", "")
+    language = data.get("language", "")
+    suggestion = full_ai_agent(code, language)
     return suggestion.strip()
 
 

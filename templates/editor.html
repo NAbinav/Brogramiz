@@ -144,13 +144,13 @@
 
   <script>
     document.addEventListener("keydown", async function (e) {
-      if (e.ctrlKey && e.key === "Enter") {
+      if (e.ctrlKey && e.key === "Enter"&& !e.shiftKey) {
         e.preventDefault();
 
         const code = editor.getValue();
         const language = document.getElementById("language").value;
 
-        const response = await fetch("/suggest", {
+        const response = await fetch("/line_ai", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ code, language })
@@ -168,6 +168,33 @@
       }
     });
   </script>
-</body>
+  <script>
+    document.addEventListener("keydown", async function (e) {
+      if (e.ctrlKey &&e.shiftKey&& e.key === "Enter") {
+        e.preventDefault();
+
+        const code = editor.getValue();
+        const language = document.getElementById("language").value;
+
+        const response = await fetch("/full_ai", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code, language })
+        });
+
+        if (response.ok) {
+          let data = await response.text();
+          data = data.trim().split('\n').slice(1, -1).join('\n');
+          const doc = editor.getDoc();
+          const cursor = doc.getCursor();
+          doc.replaceRange(data, cursor);
+        } else {
+          alert("Error getting suggestion from AI.");
+        }
+      }
+    });
+  </script>
+
+  </body>
 </html>
 

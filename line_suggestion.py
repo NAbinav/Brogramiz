@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import json
 
 
-def ai_agent(editor_content, language):
+def line_ai_agent(editor_content, language):
     load_dotenv()
     api_key = os.getenv("GEMINI_API_KEY")
     url = (

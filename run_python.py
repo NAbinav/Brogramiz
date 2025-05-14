@@ -1,41 +1,40 @@
 import subprocess
-from pathlib import Path
+import tempfile
+import os
 
 
-def run_py(input_content, editor_content):
-    # Create a temporary directory to store the Python script
-    temp_dir = Path.home() / "code_runner_tmp"
-    temp_dir.mkdir(exist_ok=True)
+def run_py(input_str: str, code: str):
+    # Create a temporary directory for storing the Python script
+    with tempfile.TemporaryDirectory() as tmpdir:
+        script_path = os.path.join(tmpdir, "script.py")
 
-    # Write the provided Python code to a file
-    py_file = temp_dir / "script.py"
-    py_file.write_text(editor_content)
+        # Save the Python code to a file in the temporary directory
+        with open(script_path, "w") as f:
+            f.write(code)
 
-    # Docker command to run the script inside a container
-    cmd = [
-        "docker",
-        "run",
-        "--rm",
-        "--read-only",
-        "--network=none",
-        "--cap-drop=ALL",
-        "--security-opt",
-        "no-new-privileges",
-        "-v",
-        f"{temp_dir}:/app:rw",  # Mount the temp directory to /app in the container
-        "-i",  # Interactive mode for stdin
-        "python:3.9-slim",  # Use the Python 3.9 slim image
-        "python",
-        "/app/script.py",  # Run the script
-    ]
+        try:
+            result = subprocess.run(
+                [
+                    "docker",
+                    "run",
+                    "--rm",
+                    "-i",  # Run the Python container
+                    "--network",
+                    "fastapi_default",  # Network used by Docker Compose
+                    "-v",
+                    f"{tmpdir}:/app:ro",  # Mount the temporary directory with code
+                    "python:3.9-slim",  # Python image
+                    "python",
+                    "/app/script.py",  # Execute the script inside the container
+                ],
+                input=input_str,
+                capture_output=True,
+                text=True,
+                timeout=10,  # Set a timeout for execution
+            )
+            return (
+                result.stdout + result.stderr
+            )  # Return the output and errors from the script
 
-    # Run the command, passing the input content, and capture the output
-    result = subprocess.run(
-        cmd,
-        input=input_content,  # Pass input directly
-        capture_output=True,
-        text=True,  # Ensure output is captured as a string
-    )
-
-    # Return the combined stdout and stderr as the result
-    return result.stdout + result.stderr
+        except subprocess.TimeoutExpired:
+            return "[Error] Execution timed out."
