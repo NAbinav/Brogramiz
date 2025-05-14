@@ -1,43 +1,29 @@
-import subprocess
+# run_java.py
+import os, subprocess, tempfile
 from pathlib import Path
 
 
-def run_java(input_content, editor_content):
-    # Create a persistent temp directory on the host
-    temp_dir = Path.home() / "code_runner_tmp"
-    temp_dir.mkdir(exist_ok=True)
+def run_java(input_str: str, code: str) -> str:
+    with tempfile.TemporaryDirectory() as tmpdir:
+        src = Path(tmpdir) / "Main.java"
+        src.write_text(code)
 
-    # Write Java source code (must be public class Main)
-    java_file = temp_dir / "Main.java"
-    java_file.write_text(editor_content)
-
-    # Docker command: read-only code mount, tmpfs for /run (writable in-container space)
-    cmd = [
-        "docker",
-        "run",
-        "--rm",
-        "--read-only",
-        "--network=none",
-        "--cap-drop=ALL",
-        "--security-opt",
-        "no-new-privileges",
-        "-v",
-        f"{temp_dir}:/app:ro",  # Read-only source
-        "--tmpfs",
-        "/run",  # Writable tmpfs for compilation and execution
-        "-i",
-        "openjdk:17-slim",
-        "sh",
-        "-c",
-        "cp /app/Main.java /run/ && cd /run && javac Main.java && java Main",
-    ]
-
-    # Execute with input and capture output
-    result = subprocess.run(
-        cmd,
-        input=input_content,
-        capture_output=True,
-        text=True,
-    )
-
-    return result.stdout + result.stderr
+        cmd = [
+            "docker",
+            "run",
+            "--rm",
+            "-i",
+            "-v",
+            f"{tmpdir}:/app",
+            "openjdk:17-slim",
+            "sh",
+            "-c",
+            "javac /app/Main.java && java -cp /app Main",
+        ]
+        try:
+            res = subprocess.run(
+                cmd, input=input_str, capture_output=True, text=True, timeout=15
+            )
+            return res.stdout + res.stderr
+        except subprocess.TimeoutExpired:
+            return "[Error] Execution timed out."

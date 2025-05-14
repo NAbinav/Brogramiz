@@ -1,32 +1,49 @@
+import os
 import subprocess
-from pathlib import Path
+import tempfile
+import uuid
 
 
-def run_go(input_content, editor_content):
-    temp_dir = Path("/tmp/code_runner")
-    temp_dir.mkdir(parents=True, exist_ok=True)
-    go_path = temp_dir / "main.go"
-    go_path.write_text(editor_content)
+def run_go(input_str: str, code: str):
+    with tempfile.TemporaryDirectory() as tmpdir:
+        src = os.path.join(tmpdir, "main.go")
 
-    cmd = [
-        "docker",
-        "run",
-        "--rm",
-        "--cpus=0.5",
-        "--memory=256m",
-        "--pids-limit=64",
-        "--read-only",
-        "--network=none",
-        "--cap-drop=ALL",
-        "--security-opt",
-        "no-new-privileges",
-        "-v",
-        f"{temp_dir}:/app:ro",
-        "golang:1.22",
-        "go",
-        "run",
-        "/app/main.go",
-    ]
+        # Write Go source
+        with open(src, "w") as f:
+            f.write(code)
 
-    result = subprocess.run(cmd, input=input_content.encode(), capture_output=True)
-    return result.stdout.decode() + result.stderr.decode()
+        try:
+            cmd = [
+                "docker",
+                "run",
+                "--rm",
+                "-i",
+                "--cpus",
+                "0.5",
+                "--memory",
+                "256m",
+                "--pids-limit",
+                "64",
+                "--network",
+                "none",
+                "--cap-drop",
+                "ALL",
+                "--security-opt",
+                "no-new-privileges",
+                "-v",
+                f"{tmpdir}:/app",
+                "golang:1.22.1",
+                "sh",
+                "-c",
+                "cd /app && go run main.go",
+            ]
+            result = subprocess.run(
+                cmd,
+                input=input_str,
+                capture_output=True,
+                text=True,
+            )
+            return result.stdout + result.stderr
+
+        except subprocess.TimeoutExpired:
+            return "[Error] Execution timed out."

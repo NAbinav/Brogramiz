@@ -6,15 +6,26 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock  # Allow FastAPI to interact with Docker
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/code-execution:/code_exec      # <-- mount for reading/writing scripts
     depends_on:
-      - python-executor  # Ensure the Python container is up before FastAPI starts
+      - python-executor
     environment:
       - DOCKER_HOST=unix:///var/run/docker.sock
+    networks:
+      - fastapi_network
 
   python-executor:
-    image: python:3.9-slim  # Use the Python 3.9 slim image for execution
-    command: tail -f /dev/null  # Keeps the container running
+    image: python:3.9-slim
+    container_name: python-executor
+    command: tail -f /dev/null             # keep it alive
     volumes:
-      - /tmp/code-execution:/app  # Temporary directory to execute code in
+      - /tmp/code-execution:/app           # <-- same host path, inside executor
+    networks:
+      - fastapi_network
+
+networks:
+  fastapi_network:
+    name: fastapi_network
+    driver: bridge
 
