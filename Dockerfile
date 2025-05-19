@@ -1,19 +1,14 @@
 FROM docker:24.0.7-dind
 
 RUN apk update && apk add --no-cache \
-    openjdk17 \
     python3 \
     py3-pip \
     py3-virtualenv \
-    gcc \
-    g++ \
-    make \
     bash \
     curl \
     jq \
     wget \
     git \
-    go \
     ca-certificates
 
 # Set up Go environment
