@@ -1,200 +1,195 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Brogramiz</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brogramiz</title>
 
-  <!-- CodeMirror CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/monokai.min.css">
+    <!-- CodeMirror CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/monokai.min.css"
+    />
 
-  <!-- CodeMirror JS -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/clike/clike.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/htmlmixed/htmlmixed.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/go/go.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/matchbrackets.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/closebrackets.min.js"></script>
+    <!-- CodeMirror JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/clike/clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/go/go.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/matchbrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/closebrackets.min.js"></script>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      margin: 0;
-      background-color: #18181b;
-      color: #f4f4f5;
-      font-family: system-ui, sans-serif;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      padding: 1rem;
-      gap: 1rem;
-    }
-    form {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      gap: 1rem;
-    }
-    .container {
-      display: flex;
-      flex: 1;
-      gap: 1rem;
-    }
-    .left, .right {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-    select, button, textarea {
-      font-size: 1rem;
-      padding: 0.5rem;
-      border-radius: 0.375rem;
-      border: 1px solid #3f3f46;
-      background-color: #27272a;
-      color: white;
-    }
-    button {
-      background-color: #2563eb;
-      border: none;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
-    button:hover {
-      background-color: #1d4ed8;
-    }
-    textarea[name="input_content"] {
-      background-color: #27272a;
-      height: 10rem;
-      resize: none;
-    }
-    .output {
-      background-color: #27272a;
-      padding: 1rem;
-      flex: 1;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      border-radius: 0.375rem;
-      font-family: monospace;
-      font-size: 0.95rem;
-    }
-    .CodeMirror {
-      height: 65vh;
-      font-size: 1rem;
-      border-radius: 0.375rem;
-      border: 1px solid #3f3f46;
-    }
-  </style>
-</head>
-<body>
-  <form method="POST" action="/submit" id="code-form">
-    <div class="container">
-      <div class="left">
-        <label>
-          Language:
-          <select id="language" name="language">
-            <option value="cpp" {% if language == 'cpp' %}selected{% endif %}>C++</option>
-            <option value="c" {% if language == 'c' %}selected{% endif %}>C</option>
-            <option value="python" {% if language == 'python' %}selected{% endif %}>Python</option>
-            <option value="java" {% if language == 'java' %}selected{% endif %}>Java</option>
-            <option value="html" {% if language == 'html' %}selected{% endif %}>HTML</option>
-            <option value="go" {% if language == 'go' %}selected{% endif %}>Go</option>
-          </select>
-        </label>
-        <textarea id="editor" name="editor_content" class="hidden">{{ content }}</textarea>
-        <textarea name="input_content" placeholder="Enter input...">{{ input }}</textarea>
-        <button type="submit">Run</button>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background-color: #18181b;
+        color: #f4f4f5;
+        font-family: system-ui, sans-serif;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        padding: 1rem;
+        gap: 1rem;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        gap: 1rem;
+      }
+      .container {
+        display: flex;
+        flex: 1;
+        gap: 1rem;
+      }
+      .left,
+      .right {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      select,
+      button,
+      textarea {
+        font-size: 1rem;
+        padding: 0.5rem;
+        border-radius: 0.375rem;
+        border: 1px solid #3f3f46;
+        background-color: #27272a;
+        color: white;
+      }
+      button {
+        background-color: #2563eb;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+      button:hover {
+        background-color: #1d4ed8;
+      }
+      textarea[name="input_content"] {
+        background-color: #27272a;
+        height: 10rem;
+        resize: none;
+      }
+      .output {
+        background-color: #27272a;
+        padding: 1rem;
+        flex: 1;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        border-radius: 0.375rem;
+        font-family: monospace;
+        font-size: 0.95rem;
+      }
+      .CodeMirror {
+        height: 65vh;
+        font-size: 1rem;
+        border-radius: 0.375rem;
+        border: 1px solid #3f3f46;
+      }
+    </style>
+  </head>
+  <body>
+    <form method="POST" action="/submit" id="code-form">
+      <div class="container">
+        <div class="left">
+          <label>
+            Language:
+            <select id="language" name="language">
+              <option value="cpp" {% if language == 'cpp' %}selected{% endif %}>C++</option>
+              <option value="c" {% if language == 'c' %}selected{% endif %}>C</option>
+              <option value="python" {% if language == 'python' %}selected{% endif %}>Python</option>
+              <option value="java" {% if language == 'java' %}selected{% endif %}>Java</option>
+              <option value="html" {% if language == 'html' %}selected{% endif %}>HTML</option>
+              <option value="go" {% if language == 'go' %}selected{% endif %}>Go</option>
+            </select>
+          </label>
+          <textarea id="editor" name="editor_content">{{ content }}</textarea>
+          <textarea name="input_content" placeholder="Enter input...">{{ input }}</textarea>
+          <button type="submit">Run</button>
+        </div>
+        <div class="right">
+          <div class="output">{{ output | safe }}</div>
+        </div>
       </div>
-      <div class="right">
-        <div class="output">{{ output | safe }}</div>
-      </div>
-    </div>
-  </form>
+    </form>
 
-  <script>
-    const languageModes = {
-      cpp: "text/x-c++src",
-      c: "text/x-csrc",
-      python: "text/x-python",
-      java: "text/x-java",
-      html: "htmlmixed",
-      go: "text/x-go"
-    };
+    <script>
+      const languageModes = {
+        cpp: "text/x-c++src",
+        c: "text/x-csrc",
+        python: "text/x-python",
+        java: "text/x-java",
+        html: "htmlmixed",
+        go: "text/x-go"
+      };
 
-    const currentLanguage = "{{ language|default('cpp') }}";
+      const currentLanguage = "{{ language | default('cpp') }}";
+      const editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
+        mode: languageModes[currentLanguage],
+        theme: "monokai",
+        lineNumbers: true,
+        matchBrackets: true,
+        autoCloseBrackets: true
+      });
+      editor.setSize("100%", "65vh");
 
-    const editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
-      mode: languageModes[currentLanguage],
-      theme: "monokai",
-      lineNumbers: true,
-      matchBrackets: true,
-      autoCloseBrackets: true,
-    });
-    editor.setSize("100%", "65vh");
+      document.getElementById("language").addEventListener("change", function () {
+        editor.setOption("mode", languageModes[this.value]);
+      });
 
-    document.getElementById("language").addEventListener("change", function () {
-      editor.setOption("mode", languageModes[this.value]);
-    });
-  </script>
-
-  <script>
-    document.addEventListener("keydown", async function (e) {
-      if (e.ctrlKey && e.key === "Enter"&& !e.shiftKey) {
-        e.preventDefault();
-
+      document.addEventListener("keydown", async function (e) {
         const code = editor.getValue();
         const language = document.getElementById("language").value;
 
-        const response = await fetch("/line_ai", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ code, language })
-        });
+        if (e.ctrlKey && e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          const response = await fetch("/line_ai", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code, language })
+          });
 
-        if (response.ok) {
-          let data = await response.text();
-          data = data.trim().split('\n').slice(1, -1).join('\n');
-          const doc = editor.getDoc();
-          const cursor = doc.getCursor();
-          doc.replaceRange(data, cursor);
-        } else {
-          alert("Error getting suggestion from AI.");
+          if (response.ok) {
+            let data = await response.text();
+            data = data.trim().split("\n").slice(1, -1).join("\n");
+            const doc = editor.getDoc();
+            const cursor = doc.getCursor();
+            doc.replaceRange(data, cursor);
+          } else {
+            alert("Error getting suggestion from AI.");
+          }
         }
-      }
-    });
-  </script>
-  <script>
-    document.addEventListener("keydown", async function (e) {
-      if (e.ctrlKey &&e.shiftKey&& e.key === "Enter") {
-        e.preventDefault();
 
-        const code = editor.getValue();
-        const language = document.getElementById("language").value;
+        if (e.ctrlKey && e.shiftKey && e.key === "Enter") {
+          e.preventDefault();
+          const response = await fetch("/full_ai", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code, language })
+          });
 
-        const response = await fetch("/full_ai", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ code, language })
-        });
-
-        if (response.ok) {
-          let data = await response.text();
-          data = data.trim().split('\n').slice(1, -1).join('\n');
-          const doc = editor.getDoc();
-          const cursor = doc.getCursor();
-          doc.replaceRange(data, cursor);
-        } else {
-          alert("Error getting suggestion from AI.");
+          if (response.ok) {
+            let data = await response.text();
+            data = data.trim().split("\n").slice(1, -1).join("\n");
+            editor.setValue(data);
+          } else {
+            alert("Error getting full suggestion from AI.");
+          }
         }
-      }
-    });
-  </script>
-
+      });
+    </script>
   </body>
 </html>
 
