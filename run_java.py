@@ -26,6 +26,7 @@ def run_java(input_str: str, code: str) -> str:
         "openjdk:17-slim",
         "sh",
         "-c",
+        "--memory=128m", "--cpus=0.5",
         inner_script,
     ]
 

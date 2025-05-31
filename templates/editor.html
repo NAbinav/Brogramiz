@@ -125,71 +125,102 @@
       </div>
     </form>
 
-    <script>
-      const languageModes = {
-        cpp: "text/x-c++src",
-        c: "text/x-csrc",
-        python: "text/x-python",
-        java: "text/x-java",
-        html: "htmlmixed",
-        go: "text/x-go"
-      };
+  <script>
+  const languageModes = {
+    cpp: "text/x-c++src",
+    c: "text/x-csrc",
+    python: "text/x-python",
+    java: "text/x-java",
+    html: "htmlmixed",
+    go: "text/x-go"
+  };
 
-      const currentLanguage = "{{ language | default('cpp') }}";
-      const editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
-        mode: languageModes[currentLanguage],
-        theme: "monokai",
-        lineNumbers: true,
-        matchBrackets: true,
-        autoCloseBrackets: true
+  const currentLanguage = "{{ language | default('cpp') }}";
+  const editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
+    mode: languageModes[currentLanguage],
+    theme: "monokai",
+    lineNumbers: true,
+    matchBrackets: true,
+    autoCloseBrackets: true
+  });
+  editor.setSize("100%", "65vh");
+
+  document.getElementById("language").addEventListener("change", function () {
+    editor.setOption("mode", languageModes[this.value]);
+  });
+
+  // ===== WebSocket Room Collaboration =====
+  let socket;
+  const roomName = prompt("Enter room name to join or create:");
+  if (roomName) {
+    socket = new WebSocket(`ws://${location.host}/ws/${roomName}`);
+    socket.onopen = () => {
+      console.log("Connected to room:", roomName);
+    };
+    socket.onmessage = (event) => {
+      const remoteCode = event.data;
+      if (remoteCode !== editor.getValue()) {
+        const cursor = editor.getCursor(); // Keep cursor position
+        editor.setValue(remoteCode);
+        editor.setCursor(cursor); // Restore cursor
+      }
+    };
+    socket.onclose = () => console.log("Disconnected from room.");
+  }
+
+  // Send updates on code change
+  let debounceTimer;
+  editor.on("change", () => {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        socket.send(editor.getValue());
+      }, 300);
+    }
+  });
+
+  // ===== AI Suggestions Shortcuts =====
+  document.addEventListener("keydown", async function (e) {
+    const code = editor.getValue();
+    const language = document.getElementById("language").value;
+
+    if (e.ctrlKey && e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      const response = await fetch("/line_ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, language })
       });
-      editor.setSize("100%", "65vh");
 
-      document.getElementById("language").addEventListener("change", function () {
-        editor.setOption("mode", languageModes[this.value]);
+      if (response.ok) {
+        let data = await response.text();
+        data = data.trim().split("\n").slice(1, -1).join("\n");
+        const doc = editor.getDoc();
+        const cursor = doc.getCursor();
+        doc.replaceRange(data, cursor);
+      } else {
+        alert("Error getting suggestion from AI.");
+      }
+    }
+
+    if (e.ctrlKey && e.shiftKey && e.key === "Enter") {
+      e.preventDefault();
+      const response = await fetch("/full_ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, language })
       });
 
-      document.addEventListener("keydown", async function (e) {
-        const code = editor.getValue();
-        const language = document.getElementById("language").value;
-
-        if (e.ctrlKey && e.key === "Enter" && !e.shiftKey) {
-          e.preventDefault();
-          const response = await fetch("/line_ai", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ code, language })
-          });
-
-          if (response.ok) {
-            let data = await response.text();
-            data = data.trim().split("\n").slice(1, -1).join("\n");
-            const doc = editor.getDoc();
-            const cursor = doc.getCursor();
-            doc.replaceRange(data, cursor);
-          } else {
-            alert("Error getting suggestion from AI.");
-          }
-        }
-
-        if (e.ctrlKey && e.shiftKey && e.key === "Enter") {
-          e.preventDefault();
-          const response = await fetch("/full_ai", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ code, language })
-          });
-
-          if (response.ok) {
-            let data = await response.text();
-            data = data.trim().split("\n").slice(1, -1).join("\n");
-            editor.setValue(data);
-          } else {
-            alert("Error getting full suggestion from AI.");
-          }
-        }
-      });
-    </script>
-  </body>
+      if (response.ok) {
+        let data = await response.text();
+        data = data.trim().split("\n").slice(1, -1).join("\n");
+        editor.setValue(data);
+      } else {
+        alert("Error getting full suggestion from AI.");
+      }
+    }
+  });
+</script>
+<body>
 </html>
 
