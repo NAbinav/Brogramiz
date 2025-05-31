@@ -34,7 +34,7 @@ An online compiler supporting **C, C++, Java, Python, Go, and HTML**, enhanced w
 |-------------|---------------|
 | Frontend    | HTML + JavaScript |
 | Backend     | FastAPI (Python) |
-| AI Model    | OpenAI or Gemini API |
+| AI Model    | Gemini API |
 | Execution   | Docker with DinD |
 | Sandbox     | Ephemeral Docker containers |
 | Communication | REST API (AJAX/fetch) |
