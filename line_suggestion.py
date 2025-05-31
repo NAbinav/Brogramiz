@@ -7,10 +7,7 @@ import json
 def line_ai_agent(editor_content, language):
     load_dotenv()
     api_key = os.getenv("GEMINI_API_KEY")
-    url = (
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key="
-        + api_key
-    )
+    url = ("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key="+ api_key)
     json_req = {
         "contents": [
             {

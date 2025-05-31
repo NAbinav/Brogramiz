@@ -14,18 +14,24 @@ def run_c(input_str: str, code: str) -> str:
     )
 
     cmd = [
-        "docker",
-        "run",
-        "--rm",
-        "-i",
-        "--network=none",
-        "--cap-drop=ALL",
-        "--security-opt=no-new-privileges",
-        "gcc:13.2.0",  # or another recent gcc version
-        "sh",
-        "-c",
-        inner_script,
-    ]
+    "docker",
+    "run",
+    "--rm",
+    "-i",
+    "--network=none",
+    "--cap-drop=ALL",
+    "--security-opt=no-new-privileges",
+    # Resource limits:
+    "--memory=256m",            # Limit memory to 256MB
+    "--memory-swap=256m",       # Disable swap beyond 256MB (same as memory)
+    "--cpus=0.5",               # Limit to 50% of one CPU core
+    "--pids-limit=100",         # Limit number of processes
+    "gcc:13.2.0",
+    "sh",
+    "-c",
+    inner_script,
+]
+
 
     try:
         proc = subprocess.run(

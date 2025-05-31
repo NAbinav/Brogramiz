@@ -14,18 +14,22 @@ def run_cpp(input_str: str, code: str) -> str:
     )
 
     cmd = [
-        "docker",
-        "run",
-        "--rm",
-        "-i",
-        "--network=none",
-        "--cap-drop=ALL",
-        "--security-opt=no-new-privileges",
-        "gcc:13.2.0",  # or another recent gcc version
-        "sh",
-        "-c",
-        inner_script,
-    ]
+    "docker",
+    "run",
+    "--rm",
+    "-i",
+    "--network=none",
+    "--cap-drop=ALL",
+    "--security-opt=no-new-privileges",
+    "--memory=256m",         # limit RAM to 256MB
+    "--memory-swap=256m",    # no swap allowed beyond memory limit
+    "--cpus=0.5",            # limit CPU to 50%
+    "--pids-limit=100",      # limit max processes to 100
+    "gcc:13.2.0",
+    "sh",
+    "-c",
+    inner_script,
+]
 
     try:
         proc = subprocess.run(

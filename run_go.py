@@ -12,23 +12,28 @@ def run_go(input_str: str, code: str) -> str:
         "export GOMODULE=off && "
         f"printf %s {input_esc} | go run /app/Main.go"
     )
-
     cmd = [
-        "docker",
-        "run",
-        "--rm",
-        "-i",
-        "--network=none",
-        "--cap-drop=ALL",
-        "--security-opt=no-new-privileges",
-        # mount a persistent cache directory to reuse compiled packages
-        "-v",
-        "go-build-cache:/go/pkg/mod",
-        "golang:1.20-alpine",
-        "sh",
-        "-c",
-        inner_script,
-    ]
+    "docker",
+    "run",
+    "--rm",
+    "-i",
+    "--network=none",
+    "--cap-drop=ALL",
+    "--security-opt=no-new-privileges",
+    # mount persistent cache directory
+    "-v",
+    "go-build-cache:/go/pkg/mod",
+    # resource limits here:
+    "--memory=512m",          # limit RAM to 512 MB
+    "--memory-swap=128m",     # disallow swap beyond memory limit
+    "--cpus=0.5",             # limit to 1 CPU core
+    "--pids-limit=200",       # limit number of processes to 200
+    "golang:1.20-alpine",
+    "sh",
+    "-c",
+    inner_script,
+]
+
     try:
         proc = subprocess.run(
             cmd,

@@ -13,18 +13,21 @@ def run_py(input_str: str, code: str) -> str:
     )
 
     cmd = [
-        "docker",
-        "run",
-        "--rm",
-        "-i",
-        "--network=none",
-        "--cap-drop=ALL",
-        "--security-opt=no-new-privileges",
-        "python:3.9-slim",
-        "sh",
-        "-c",
-        inner_script,
-    ]
+    "docker",
+    "run",
+    "--rm",
+    "-i",
+    "--network=none",
+    "--cap-drop=ALL",
+    "--security-opt=no-new-privileges",
+    "--memory=256m",        # limit memory to 256MB
+    "--memory-swap=256m",   # no swap beyond 256MB
+    "--cpus=0.5",           # limit CPU to half core
+    "python:3.9-slim",
+    "sh",
+    "-c",
+    inner_script,
+]
 
     try:
         proc = subprocess.run(
