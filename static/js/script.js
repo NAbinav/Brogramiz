@@ -75,7 +75,8 @@
         const language = document.getElementById("language").value;
 
         // Update output with loading state
-        document.querySelector(".output").innerHTML = "⏳ Running code...";
+        const outputDiv = document.querySelector(".output");
+        outputDiv.innerHTML = "⏳ Running code...";
 
         const formData = new FormData();
         formData.append("editor_content", code);
@@ -89,16 +90,29 @@
           });
 
           if (response.ok) {
-            const html = await response.text();
+            const htmlResponse = await response.text();
             const parser = new DOMParser();
-            const doc = parser.parseFromString(html, "text/html");
-            const newOutput = doc.querySelector(".output").innerHTML;
-            document.querySelector(".output").innerHTML = newOutput;
+            const doc = parser.parseFromString(htmlResponse, "text/html");
+            
+            // Extract the output from the returned HTML template
+            const outputElement = doc.querySelector(".output");
+            if (outputElement) {
+              // Get the inner content and display it properly
+              const outputContent = outputElement.textContent || outputElement.innerText || "";
+              if (outputContent.trim()) {
+                outputDiv.textContent = outputContent;
+              } else {
+                outputDiv.innerHTML = "✅ Code executed successfully (no output)";
+              }
+            } else {
+              outputDiv.innerHTML = "✅ Code executed successfully";
+            }
           } else {
-            document.querySelector(".output").innerHTML = "❌ Error running code.";
+            const errorText = await response.text();
+            outputDiv.innerHTML = `<span style="color: #ef4444;">❌ Error (${response.status}): ${errorText || 'Failed to run code'}</span>`;
           }
         } catch (error) {
-          document.querySelector(".output").innerHTML = "❌ Network error occurred.";
+          outputDiv.innerHTML = `<span style="color: #ef4444;">❌ Network error: ${error.message}</span>`;
         }
       });
 
@@ -171,7 +185,7 @@
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(() => {
               socket.send(editor.getValue());
-            }, 70);
+            }, 1);
           }
         });
       }
