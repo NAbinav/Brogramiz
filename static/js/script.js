@@ -185,7 +185,11 @@
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(() => {
               socket.send(editor.getValue());
+<<<<<<< HEAD
             }, 1);
+=======
+            }, 10);
+>>>>>>> c9172bc (.)
           }
         });
       }
@@ -260,6 +264,131 @@
               alert("Network error occurred while getting AI suggestion.");
             }
           }
+<<<<<<< HEAD
+=======
+	          if (e.ctrlKey && e.shiftKey && e.key === "Enter") {
+            e.preventDefault();
+            try {
+              const response = await fetch("/full_ai", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ code, language })
+              });
+
+              if (response.ok) {
+                let data = await response.text();
+                data = data.trim().split("\n").slice(1, -1).join("\n");
+                editor.setValue(data);
+              } else {
+                alert("Error getting full suggestion from AI.");
+              }
+            } catch (error) {
+              alert("Network error occurred while getting AI suggestion.");
+            }
+          }
+          if (e.ctrlKey && e.shiftKey && e.key === "Enter") {
+            e.preventDefault();
+            try {
+              const response = await fetch("/full_ai", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ code, language })
+              });
+
+              if (response.ok) {
+                let data = await response.text();
+                data = data.trim().split("\n").slice(1, -1).join("\n");
+                editor.setValue(data);
+              } else {
+                alert("Error getting full suggestion from AI.");
+              }
+            } catch (error) {
+              alert("Network error occurred while getting AI suggestion.");
+            }
+          }
+		                if (e.ctrlKey && e.shiftKey && e.key === "Enter") {
+            e.preventDefault();
+            try {
+              const response = await fetch("/full_ai", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ code, language })
+              });
+
+              if (response.ok) {
+                let data = await response.text();
+                data = data.trim().split("\n").slice(1, -1).join("\n");
+                editor.setValue(data);
+              } else {
+                alert("Error getting full suggestion from AI.");
+              }
+            } catch (error) {
+              alert("Network error occurred while getting AI suggestion.");
+            }
+          }
+          if (e.ctrlKey && e.shiftKey && e.key === "Enter") {
+            e.preventDefault();
+            try {
+              const response = await fetch("/full_ai", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ code, language })
+              });
+
+              if (response.ok) {
+                let data = await response.text();
+                data = data.trim().split("\n").slice(1, -1).join("\n");
+                editor.setValue(data);
+              } else {
+                alert("Error getting full suggestion from AI.");
+              }
+            } catch (error) {
+              alert("Network error occurred while getting AI suggestion.");
+            }
+          }
+		      if (e.ctrlKey && e.shiftKey && e.key === "Enter") {
+            e.preventDefault();
+            try {
+              const response = await fetch("/full_ai", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ code, language })
+              });
+
+              if (response.ok) {
+                let data = await response.text();
+                data = data.trim().split("\n").slice(1, -1).join("\n");
+                editor.setValue(data);
+              } else {
+                alert("Error getting full suggestion from AI.");
+              }
+            } catch (error) {
+              alert("Network error occurred while getting AI suggestion.");
+            }
+          }
+	if (e.ctrlKey && e.key === "a") {
+            e.preventDefault();
+            try {
+              const response = await fetch("/bug_fix", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ code, language })
+              });
+
+              if (response.ok) {
+                let data = await response.text();
+                data = data.trim().split("\n").slice(1, -1).join("\n");
+                editor.setValue(data);
+              } else {
+                alert("Error getting full suggestion from AI.");
+              }
+            } catch (error) {
+              alert("Network error occurred while getting AI suggestion.");
+            }
+          }
+
+
+>>>>>>> c9172bc (.)
         });
       }
 
