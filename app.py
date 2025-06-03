@@ -4,7 +4,6 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from run import run
 from line_suggestion import line_ai_agent
-<<<<<<< HEAD
 from full_suggestion import full_ai_agent
 from typing import Dict, List
 
@@ -40,27 +39,24 @@ async def line_ai(request: Request):
     data = await request.json()
     code = data.get("code", "")
     language = data.get("language", "")
-<<<<<<< HEAD
     suggestion = line_ai_agent(code, language)
     return suggestion.strip()
 
 
-=======
+
     suggestion = ai_agent(language=language, 
                                editor_content=code,prompt=open("./prompts/line.txt").read())
     return suggestion.strip()
->>>>>>> c9172bc (.)
 @app.post("/full_ai", response_class=PlainTextResponse)
 async def full_ai(request: Request):
     data = await request.json()
     code = data.get("code", "")
     language = data.get("language", "")
-<<<<<<< HEAD
     suggestion = full_ai_agent(code, language)
     return suggestion.strip()
 
 
-=======
+
     suggestion = full_ai_agent(language=language, 
                                editor_content=code,prompt=open("./prompts/file.txt").read())
     return suggestion.strip()
@@ -78,7 +74,6 @@ async def bug_fix(request: Request):
 
 
 
->>>>>>> c9172bc (.)
 @app.post("/submit", response_class=HTMLResponse)
 async def submit_editor_content(
     request: Request,
