@@ -7,12 +7,8 @@ from line_suggestion import line_ai_agent
 from full_suggestion import full_ai_agent
 from typing import Dict, List
 
-=======
 from ai_explain import ai_agent
-from full_suggestion import full_ai_agent
 from typing import Dict, List
-from ai_explain import ai_agent
->>>>>>> c9172bc (.)
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
@@ -52,7 +48,7 @@ async def full_ai(request: Request):
     data = await request.json()
     code = data.get("code", "")
     language = data.get("language", "")
-    suggestion = full_ai_agent(code, language)
+    suggestion = full_ai_agent(code, language,prompt=open("./prompts/file.txt").read())
     return suggestion.strip()
 
 
