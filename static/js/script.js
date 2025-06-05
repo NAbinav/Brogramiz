@@ -186,7 +186,7 @@
             debounceTimer = setTimeout(() => {
               socket.send(editor.getValue());
             }, 1);
-
+          }
         });
       }
 
@@ -227,8 +227,9 @@
               });
 
               if (response.ok) {
-                let data = await response.text();
-                data = data.trim().split("\n").slice(1, -1).join("\n");
+                let data_json = await response.json();
+					      console.log("Response data:", data_json.output);
+		data=data_json.output;
                 const doc = editor.getDoc();
                 const cursor = doc.getCursor();
                 doc.replaceRange(data, cursor);
@@ -250,8 +251,7 @@
               });
 
               if (response.ok) {
-                let data = await response.text();
-                data = data.trim().split("\n").slice(1, -1).join("\n");
+                let data = await response.json().output;
                 editor.setValue(data);
               } else {
                 alert("Error getting full suggestion from AI.");
@@ -260,6 +260,29 @@
               alert("Network error occurred while getting AI suggestion.");
             }
           }
+	if (e.ctrlKey && e.shiftKey && e.key === "L") {
+            e.preventDefault();
+            try {
+              const response = await fetch("/bug_fix", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ code, language })
+              });
+
+              if (response.ok) {
+                let data = await response.text();
+                data = data.trim().split("\n").slice(1, -1).join("\n");
+					      		console.log(data);
+
+                editor.setValue(data);
+              } else {
+                alert("Error getting full suggestion from AI.");
+              }
+            } catch (error) {
+              alert("Network error occurred while getting AI suggestion.");
+            }
+          }
+
         });
       }
 

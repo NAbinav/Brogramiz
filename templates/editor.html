@@ -8,7 +8,7 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css"
     />
-		<link
+    <link
       rel="stylesheet"
       href="/static/css/style.css"
     />
@@ -19,16 +19,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/matchbrackets.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/closebrackets.min.js"></script>
-		<script src=" https://cdn.jsdelivr.net/npm/yjs@13.6.27/src/types/YXmlHook.min.js "></script>
-	<!-- Yjs -->
-<script src="https://unpkg.com/yjs@13.6.9/dist/yjs.js"></script>
-
-<!-- WebRTC provider for Yjs -->
-<script src="https://unpkg.com/y-webrtc@10.1.6/dist/y-webrtc.js"></script>
-
-<!-- Codemirror binding -->
-<script src="https://unpkg.com/y-codemirror/build/y-codemirror.js"></script>
-
   </head>
   <body>
     <!-- Header -->
@@ -80,16 +70,12 @@
           <div class="right-panel">
             <div class="io-section">
               <div class="input-container">
-                <div class="section-title">
-                 Input
-                </div>
+                <div class="section-title">Input</div>
                 <textarea name="input_content" placeholder="Enter input for your program...">{{ input }}</textarea>
               </div>
               
               <div class="output-container">
-                <div class="section-title">
-                  Output
-                </div>
+                <div class="section-title">Output</div>
                 <div class="output">{{ output | safe }}</div>
               </div>
             </div>
@@ -98,24 +84,29 @@
       </form>
     </div>
 
-    <!-- Room Modal -->
+    <!-- Room Modal - COMPLETE VERSION -->
     <div class="modal" id="roomModal">
       <div class="modal-content">
         <h3 class="modal-title">Join Collaboration Room</h3>
+        
         <div class="form-group">
           <label for="roomNameInput">Room Name:</label>
-          <input type="text" id="roomNameInput" placeholder="Enter room name...">
+          <input type="text" id="roomNameInput" placeholder="Enter room name..." />
         </div>
+        
         <div class="form-group">
           <label for="roomPasswordInput">Password:</label>
-          <input type="password" id="roomPasswordInput" placeholder="Enter room password...">
+          <input type="password" id="roomPasswordInput" placeholder="Enter room password..." />
         </div>
+        
         <div class="modal-actions">
           <button class="btn btn-outline" onclick="closeRoomModal()">Cancel</button>
           <button class="btn btn-primary" onclick="joinRoom()">Join Room</button>
         </div>
       </div>
     </div>
+
+    <!-- Load JavaScript -->
+    <script src="/static/js/script.js"></script>
   </body>
-	<script src="/static/js/script.js"></script>
 </html>

@@ -7,7 +7,7 @@ from line_suggestion import line_ai_agent
 from full_suggestion import full_ai_agent
 from typing import Dict, List
 
-from ai_explain import ai_agent
+from ai_explain import ai_agent,call_llm
 from typing import Dict, List
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -35,27 +35,22 @@ async def line_ai(request: Request):
     data = await request.json()
     code = data.get("code", "")
     language = data.get("language", "")
-    suggestion = line_ai_agent(code, language)
-    return suggestion.strip()
 
 
 
-    suggestion = ai_agent(language=language, 
-                               editor_content=code,prompt=open("./prompts/line.txt").read())
-    return suggestion.strip()
+    suggestion = call_llm(language=language,code=code,prompt=open("./prompts/line.txt").read())
+    print(suggestion)
+    return suggestion
 @app.post("/full_ai", response_class=PlainTextResponse)
 async def full_ai(request: Request):
     data = await request.json()
     code = data.get("code", "")
     language = data.get("language", "")
-    suggestion = full_ai_agent(code, language,prompt=open("./prompts/file.txt").read())
-    return suggestion.strip()
 
-
-
-    suggestion = full_ai_agent(language=language, 
-                               editor_content=code,prompt=open("./prompts/file.txt").read())
-    return suggestion.strip()
+    suggestion = call_llm(language=language, 
+                               code=code,prompt=open("./prompts/file.txt").read())
+    print(suggestion)
+    return suggestion
 
 
 @app.post("/bug_fix", response_class=PlainTextResponse)
@@ -63,9 +58,9 @@ async def bug_fix(request: Request):
     data = await request.json()
     code = data.get("code", "")
     language = data.get("language", "")
-    suggestion = full_ai_agent(language=language, 
-                               editor_content=code,prompt=open("./prompts/bug_fix.txt").read())
-    return suggestion.strip()
+    suggestion = call_llm(language=language, 
+                               code=code,prompt=open("./prompts/bug_fix.txt").read())
+    return suggestion
 
 
 

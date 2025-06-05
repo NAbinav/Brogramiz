@@ -6,3 +6,5 @@ python-multipart
 pygments
 requests
 websockets
+google-generativeai
+google-genai
