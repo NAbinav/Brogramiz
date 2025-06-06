@@ -240,8 +240,7 @@
               alert("Network error occurred while getting AI suggestion.");
             }
           }
-
-          if (e.ctrlKey && e.shiftKey && e.key === "Enter") {
+	 if (e.ctrlKey && e.key === "Enter" && e.shiftKey) {
             e.preventDefault();
             try {
               const response = await fetch("/full_ai", {
@@ -251,10 +250,32 @@
               });
 
               if (response.ok) {
-                let data = await response.json().output;
-                editor.setValue(data);
+                let data_json = await response.json();
+					      console.log("Response data:", data_json.output);
+		data=data_json.output;
+                const doc = editor.setValue(data);
               } else {
-                alert("Error getting full suggestion from AI.");
+                alert("Error getting suggestion from AI.");
+              }
+            } catch (error) {
+              alert("Network error occurred while getting AI suggestion.");
+            }
+          }
+
+	if (e.ctrlKey && e.key === "y") {
+            e.preventDefault();
+            try {
+              const response = await fetch("/explain", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ code, language })
+              });
+
+              if (response.ok) {
+                let data_json = await response.json();
+		console.log("Response data:", data_json.output);
+              } else {
+                alert("Error getting suggestion from AI.");
               }
             } catch (error) {
               alert("Network error occurred while getting AI suggestion.");
@@ -272,9 +293,8 @@
               if (response.ok) {
                 let data = await response.text();
                 data = data.trim().split("\n").slice(1, -1).join("\n");
-					      		console.log(data);
-
-                editor.setValue(data);
+					      		console.log(data.output);
+                editor.setValue(data.output);
               } else {
                 alert("Error getting full suggestion from AI.");
               }

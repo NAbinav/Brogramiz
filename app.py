@@ -35,25 +35,23 @@ async def line_ai(request: Request):
     data = await request.json()
     code = data.get("code", "")
     language = data.get("language", "")
-
-
-
     suggestion = call_llm(language=language,code=code,prompt=open("./prompts/line.txt").read())
     print(suggestion)
     return suggestion
+
 @app.post("/full_ai", response_class=PlainTextResponse)
-async def full_ai(request: Request):
+async def fukk_ai(request: Request):
     data = await request.json()
     code = data.get("code", "")
     language = data.get("language", "")
-
-    suggestion = call_llm(language=language, 
-                               code=code,prompt=open("./prompts/file.txt").read())
+    suggestion = call_llm(language=language,code=code,prompt=open("./prompts/file.txt").read())
     print(suggestion)
     return suggestion
 
 
+
 @app.post("/bug_fix", response_class=PlainTextResponse)
+
 async def bug_fix(request: Request):
     data = await request.json()
     code = data.get("code", "")
@@ -61,6 +59,19 @@ async def bug_fix(request: Request):
     suggestion = call_llm(language=language, 
                                code=code,prompt=open("./prompts/bug_fix.txt").read())
     return suggestion
+
+@app.post("/explain", response_class=PlainTextResponse)
+
+async def explain(request: Request):
+    data = await request.json()
+    code = data.get("code", "")
+    language = data.get("language", "")
+    suggestion = call_llm(language=language, 
+                               code=code,prompt=open("./prompts/explain.txt").read())
+    return suggestion
+
+
+
 
 
 
