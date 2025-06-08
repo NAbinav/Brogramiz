@@ -40,7 +40,7 @@ async def line_ai(request: Request):
     return suggestion
 
 @app.post("/full_ai", response_class=PlainTextResponse)
-async def fukk_ai(request: Request):
+async def full_ai(request: Request):
     data = await request.json()
     code = data.get("code", "")
     language = data.get("language", "")
@@ -56,8 +56,7 @@ async def bug_fix(request: Request):
     data = await request.json()
     code = data.get("code", "")
     language = data.get("language", "")
-    suggestion = call_llm(language=language, 
-                               code=code,prompt=open("./prompts/bug_fix.txt").read())
+    suggestion = call_llm(language=language, code=code,prompt=open("./prompts/bug_fix.txt").read())
     return suggestion
 
 @app.post("/explain", response_class=PlainTextResponse)
@@ -136,5 +135,6 @@ async def websocket_endpoint(websocket: WebSocket, room_name: str):
     except WebSocketDisconnect:
         print(f"Client disconnected from room {room_name}")
     finally:
-        if room_name in rooms and websocket in rooms[room_name]["clients"]:
-            rooms[room_name]["clients"].remove(websocket)
+        if not rooms[room_name]["clients"]:
+            del rooms[room_name]
+

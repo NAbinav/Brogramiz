@@ -291,8 +291,7 @@
               });
 
               if (response.ok) {
-                let data = await response.text();
-                data = data.trim().split("\n").slice(1, -1).join("\n");
+                let data = await response.json();
 					      		console.log(data.output);
                 editor.setValue(data.output);
               } else {
