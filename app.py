@@ -70,29 +70,24 @@ async def explain(request: Request):
     return suggestion
 
 
-
-
-
-
-
-@app.post("/submit", response_class=HTMLResponse)
+@app.post("/submit")
 async def submit_editor_content(
     request: Request,
-    editor_content: str = Form(...),
-    input_content: str = Form(""),
-    language: str = Form("cpp"),
+    data: dict  # Changed to accept JSON
 ):
+    editor_content = data.get("editor_content", "")
+    input_content = data.get("input_content", "")
+    language = data.get("language", "cpp")
+    
+    if not editor_content:
+        raise HTTPException(status_code=422, detail=[{
+            "loc": ["body", "editor_content"],
+            "msg": "Field required",
+            "type": "missing"
+        }])
+    
     output = run(input_content, editor_content, language)
-    return templates.TemplateResponse(
-        "editor.html",
-        {
-            "request": request,
-            "content": editor_content,
-            "output": output,
-            "input": input_content,
-            "language": language,
-        },
-    )
+    return {"output": output}
 rooms: Dict[str, Dict[str, any]] = {}
 
 @app.websocket("/ws/{room_name}")
