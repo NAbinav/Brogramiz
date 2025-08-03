@@ -153,7 +153,8 @@
         currentRoom = roomName;
         updateConnectionStatus("connecting");
 
-        socket = new WebSocket(`ws://${location.host}/ws/${roomName}`);
+	const protocol = location.protocol === "https:" ? "wss:" : "ws:";
+	const socket = new WebSocket(`${protocol}//${location.host}/ws/${roomName}`);
         
         socket.onopen = () => {
           console.log("Connected to room:", roomName);
