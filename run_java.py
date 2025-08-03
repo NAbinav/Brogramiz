@@ -23,12 +23,14 @@ def run_java(input_str: str, code: str) -> str:
         "--network=none",
         "--cap-drop=ALL",
         "--security-opt=no-new-privileges",
+        "--memory=128m",  # <-- move here
+        "--cpus=0.5",     # <-- move here
         "openjdk:17-slim",
         "sh",
         "-c",
-        "--memory=128m", "--cpus=0.5",
-        inner_script,
+        inner_script
     ]
+
 
     try:
         proc = subprocess.run(
