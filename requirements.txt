@@ -1,0 +1,10 @@
+fastapi
+python-dotenv
+uvicorn[standard]
+jinja2
+python-multipart
+pygments
+requests
+websockets
+google-generativeai
+google-genai
