@@ -7,11 +7,11 @@ from line_suggestion import line_ai_agent
 from full_suggestion import full_ai_agent
 from typing import Dict, List
 
-from ai_explain import ai_agent,call_llm
+# from ai_explain import ai_agent,call_llm
 from typing import Dict, List
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
+# app.mount("/static", StaticFiles(directory="static"), name="static")
+# templates = Jinja2Templates(directory="templates")
 
 # In-memory room manager
 
