@@ -10,7 +10,7 @@ def run_go(input_str: str, code: str) -> str:
         
         # Run directly with go run (for simplicity; could build for perf)
         run_result = subprocess.run(
-            ['firejail', '--net=none', '--rlimit-cpu=5', 'go', 'run', code_path],
+            ['firejail', '--private','--net=none', '--rlimit-cpu=5', 'go', 'run', code_path],
             input=input_str.encode(),
             capture_output=True,
             timeout=10

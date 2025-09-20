@@ -1,42 +1,133 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
+.app {
+          height: 100vh;
+          display: flex;
+          flex-direction: column;
+          background: #1e1e1e;
+          color: #fff;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
+        .language-selector {
+          padding: 16px;
+          background: #252526;
+          border-bottom: 1px solid #3c3c3c;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
+        .language-selector label {
+          font-weight: 500;
+          color: #cccccc;
+        }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
+        .language-selector select {
+          padding: 8px 12px;
+          background: #3c3c3c;
+          color: #fff;
+          border: 1px solid #4a4a4a;
+          border-radius: 4px;
+          font-size: 14px;
+          outline: none;
+          cursor: pointer;
+        }
 
-.card {
-  padding: 2em;
-}
+        .language-selector select:hover {
+          border-color: #007acc;
+        }
 
-.read-the-docs {
-  color: #888;
-}
+        .editor-container {
+          flex: 1;
+          min-height: 0;
+          border-bottom: 1px solid #3c3c3c;
+        }
+
+        .input-panel {
+          padding: 16px;
+          background: #252526;
+          border-bottom: 1px solid #3c3c3c;
+        }
+
+        .input-panel label {
+          display: block;
+          margin-bottom: 8px;
+          font-weight: 500;
+          color: #cccccc;
+        }
+
+        .input-panel textarea {
+          width: 100%;
+          height: 80px;
+          padding: 12px;
+          background: #1e1e1e;
+          color: #fff;
+          border: 1px solid #3c3c3c;
+          border-radius: 4px;
+          font-family: 'Consolas', 'Monaco', monospace;
+          font-size: 13px;
+          resize: vertical;
+          outline: none;
+        }
+
+        .input-panel textarea:focus {
+          border-color: #007acc;
+        }
+
+        .submit-btn {
+          margin: 16px;
+          padding: 12px 24px;
+          background: linear-gradient(135deg, #007acc, #005a9e);
+          color: white;
+          border: none;
+          border-radius: 6px;
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+          background: linear-gradient(135deg, #005a9e, #004578);
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(0, 122, 204, 0.3);
+        }
+
+        .submit-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          transform: none;
+        }
+
+        .submit-btn.loading {
+          position: relative;
+        }
+
+        .output-panel {
+          padding: 16px;
+          background: #0d1117;
+          flex: 1;
+          min-height: 120px;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .output-panel label {
+          margin-bottom: 8px;
+          font-weight: 500;
+          color: #58a6ff;
+        }
+
+        .output-panel pre {
+          flex: 1;
+          padding: 12px;
+          background: #161b22;
+          color: #7ee787;
+          border: 1px solid #30363d;
+          border-radius: 4px;
+          font-family: 'Consolas', 'Monaco', monospace;
+          font-size: 13px;
+          overflow: auto;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+          margin: 0;
+        }
