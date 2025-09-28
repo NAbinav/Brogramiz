@@ -1,35 +1,55 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request, Form
-from fastapi.responses import HTMLResponse, PlainTextResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse,JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from run import run
 # from line_suggestion import line_ai_agent
 # from full_suggestion import full_ai_agent
 from typing import Dict, List
+from fastapi.middleware.cors import CORSMiddleware
+origins=["localhost:8080","localhost:5173"]
 
 # from ai_explain import ai_agent,call_llm
 from typing import Dict, List
-from check_groq import ai
+from check_groq import ai, lineai
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 @app.post("/line_ai", response_class=PlainTextResponse)
-async def line_ai(request: Request):
+async def line_ai(
+    request: Request,
+    data: dict  # Changed to accept JSON
+):
     data = await request.json()
     code = data.get("code", "")
-    language = data.get("language", "")
-    suggestion = ai(language=language,code=code,prompt=open("./prompts/line.txt").read())
+    # language = data.get("language", "")
+    # print(language)
+    suggestion = lineai(code=code,system_prompt=open("./prompts/line.txt").read())
     print(suggestion)
-    return suggestion
-#
-# @app.post("/full_ai", response_class=PlainTextResponse)
-# async def full_ai(request: Request):
-#     data = await request.json()
-#     code = data.get("code", "")
-#     language = data.get("language", "")
-#     suggestion = call_llm(language=language,code=code,prompt=open("./prompts/file.txt").read())
-#     print(suggestion)
-#     return suggestion
-#
+    return JSONResponse(content=suggestion)
+
+
+@app.post("/full_ai", response_class=PlainTextResponse)
+async def full_ai(
+    request: Request,
+    data: dict  # Changed to accept JSON
+):
+    data = await request.json()
+    code = data.get("code", "")
+    # language = data.get("language", "")
+    # print(language)
+    suggestion = lineai(code=code,system_prompt=open("./prompts/full.txt").read())
+    print(suggestion)
+    return JSONResponse(content=suggestion)
+
+
 #
 #
 # @app.post("/bug_fix", response_class=PlainTextResponse)
@@ -52,7 +72,7 @@ async def line_ai(request: Request):
 #     return suggestion
 #
 
-print("hell")
+# print("hell")
 @app.post("/submit")
 async def submit_editor_content(
     request: Request,
@@ -70,6 +90,7 @@ async def submit_editor_content(
         }])
     
     output = run(input_content, editor_content, language)
+    print(output)
     return {"output": output}
 # rooms: Dict[str, Dict[str, any]] = {}
 

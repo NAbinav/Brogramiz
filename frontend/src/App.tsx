@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Editor, { useMonaco } from "@monaco-editor/react";
-import {languageConfigs} from "../lib/langConfig.js"
+import { languageConfigs } from "../lib/langConfig.js"
 import "./App.css"
 
 function useEditorSetup(monaco, language) {
@@ -8,7 +8,7 @@ function useEditorSetup(monaco, language) {
     if (!monaco || !languageConfigs[language]) return;
 
     const { snippets } = languageConfigs[language];
-    
+
     const provider = monaco.languages.registerCompletionItemProvider(language, {
       provideCompletionItems: () => ({
         suggestions: snippets.map(snippet => ({
@@ -58,7 +58,7 @@ function CodeEditor({ language, value, onChange }) {
   return (
     <div className="editor-container">
       <Editor
-        height="100%"
+        height="400px"
         theme="vs-dark"
         language={language === "go" ? "go" : language}
         value={value}
@@ -69,7 +69,7 @@ function CodeEditor({ language, value, onChange }) {
           scrollBeyondLastLine: false,
           automaticLayout: true
         }}
-        
+
 
       />
     </div>
@@ -102,17 +102,30 @@ function OutputPanel({ output }) {
 }
 
 // Submit button component
-function SubmitButton({ onClick, loading }) {
+function SubmitButton({ onClick, loading, text, loading_text }) {
   return (
     <button
       onClick={onClick}
       disabled={loading}
       className={`submit-btn ${loading ? "loading" : ""}`}
     >
-      {loading ? "Running..." : "Run Code"}
+      {loading ? loading_text : text}
     </button>
   );
 }
+//line ai button
+// function LineAIButton({ onClick, loading }) {
+//   return (
+//     <button
+//       onClick={onClick}
+//       disabled={loading}
+//       className={`submit-btn ${loading ? "loading" : ""}`}
+//     >
+//       {loading ? "Generating..." : "Generate Line AI"}
+//     </button>
+//   );
+// }
+
 
 // Main app component
 export default function App() {
@@ -149,7 +162,9 @@ export default function App() {
       setLoading(false);
     }
   };
-const lineai = async () => {
+  const lineai = async () => {
+
+    setLoading(true);
     try {
       const response = await fetch("api/line_ai", {
         method: "POST",
@@ -167,7 +182,36 @@ const lineai = async () => {
       }
 
       const data = await response.json();
-      setOutput(data.output || "No output");
+      console.log(data)
+      setEditorContent(data.finished_code);
+    } catch (err) {
+      setOutput(`Request failed: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fullai = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("api/full_ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: editorContent,
+          language: language
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        setOutput(`Error: ${JSON.stringify(error)}`);
+        return;
+      }
+
+      const data = await response.json();
+      console.log(data)
+      setEditorContent(data.finished_code);
     } catch (err) {
       setOutput(`Request failed: ${err.message}`);
     } finally {
@@ -178,27 +222,42 @@ const lineai = async () => {
 
   return (
     <div className="app">
-      <LanguageSelector 
-        language={language} 
-        onChange={setLanguage} 
+      <LanguageSelector
+        language={language}
+        onChange={setLanguage}
       />
-      
+
       <CodeEditor
         language={language}
         value={editorContent}
         onChange={(val) => setEditorContent(val || "")}
       />
-      
+
       <InputPanel
         value={inputContent}
         onChange={setInputContent}
       />
-      
+
+      <SubmitButton
+        onClick={handleSubmit}
+        loading={loading}
+        text="Run Code"
+        loading_text="Running..."
+      />
       <SubmitButton
         onClick={lineai}
         loading={loading}
+        text="Generate Line AI"
+        loading_text="Generating..."
       />
-      
+
+      <SubmitButton
+        onClick={fullai}
+        loading={loading}
+        text="Generate Full AI"
+        loading_text="Generating..."
+      />
+
       <OutputPanel output={output} />
     </div>
   );
