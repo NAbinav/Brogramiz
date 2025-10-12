@@ -11,7 +11,7 @@ origins=["localhost:8080","localhost:5173"]
 
 # from ai_explain import ai_agent,call_llm
 from typing import Dict, List
-from check_groq import ai, lineai
+from check_groq import  lineai
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -48,6 +48,20 @@ async def full_ai(
     suggestion = lineai(code=code,system_prompt=open("./prompts/full.txt").read())
     print(suggestion)
     return JSONResponse(content=suggestion)
+
+@app.post("/bug_fix", response_class=PlainTextResponse)
+async def bug_fix(
+    request: Request,
+    data: dict  # Changed to accept JSON
+):
+    data = await request.json()
+    code = data.get("code", "")
+    # language = data.get("language", "")
+    # print(language)
+    suggestion = lineai(code=code,system_prompt=open("./prompts/bug_fix.txt").read())
+    print(suggestion)
+    return JSONResponse(content=suggestion)
+
 
 
 #

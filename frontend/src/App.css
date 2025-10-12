@@ -29,12 +29,12 @@ body {
 
 .language-selector label,
 .input-panel label,
-/* .output-panel label { */
-/*   display: block; */
-/*   font-weight: 600; */
-/*   margin-bottom: 8px; */
-/*   font-size: 14px; */
-/* } */
+.output-panel label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
 
 .language-selector select,
 .input-panel textarea {
@@ -65,7 +65,8 @@ body {
   flex: 1;
   padding: 12px;
   border: none;
-  border-radius: 8px;
+  margin: 5px;
+  border-radius: 0px;
   background: #007acc;
   color: #fff;
   cursor: pointer;

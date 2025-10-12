@@ -219,13 +219,71 @@ export default function App() {
     }
   };
 
+  const bug_fix = async () => {
+
+    setLoading(true);
+    try {
+      const response = await fetch("api/bug_fix", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: editorContent,
+          language: language
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        setOutput(`Error: ${JSON.stringify(error)}`);
+        return;
+      }
+
+      const data = await response.json();
+      console.log(data)
+      setEditorContent(data.finished_code);
+    } catch (err) {
+      setOutput(`Request failed: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
 
   return (
     <div className="app">
-      <LanguageSelector
-        language={language}
-        onChange={setLanguage}
-      />
+      <div className="">
+        <LanguageSelector
+          language={language}
+          onChange={setLanguage}
+        />
+
+        <SubmitButton
+          onClick={handleSubmit}
+          loading={loading}
+          text="Run Code"
+          loading_text="Running..."
+        />
+        <SubmitButton
+          onClick={lineai}
+          loading={loading}
+          text="Generate Line AI"
+          loading_text="Generating..."
+        />
+
+        <SubmitButton
+          onClick={fullai}
+          loading={loading}
+          text="Generate Full AI"
+          loading_text="Generating..."
+        />
+        <SubmitButton
+          onClick={bug_fix}
+          loading={loading}
+          text="Fix Bug"
+          loading_text="Fixing..."
+        />
+      </div>
 
       <CodeEditor
         language={language}
@@ -238,25 +296,8 @@ export default function App() {
         onChange={setInputContent}
       />
 
-      <SubmitButton
-        onClick={handleSubmit}
-        loading={loading}
-        text="Run Code"
-        loading_text="Running..."
-      />
-      <SubmitButton
-        onClick={lineai}
-        loading={loading}
-        text="Generate Line AI"
-        loading_text="Generating..."
-      />
 
-      <SubmitButton
-        onClick={fullai}
-        loading={loading}
-        text="Generate Full AI"
-        loading_text="Generating..."
-      />
+
 
       <OutputPanel output={output} />
     </div>

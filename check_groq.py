@@ -20,6 +20,7 @@ def lineai( code, system_prompt):
     )
     structured_llm=llm.with_structured_output(CodeOutput)
     input=code 
+    print(code)
     return(structured_llm.invoke(input).dict())
 
 

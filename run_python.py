@@ -9,8 +9,18 @@ def run_py(input_str: str, code: str) -> str:
     
     try:
         result = subprocess.run(
-            ['firejail', '--net=none', '--rlimit-cpu=5', 'python3', temp_file_path],
-            input=input_str.encode(),
+[
+    'firejail',
+    '--private',              
+    '--net=none',             
+    '--noroot',               
+    '--seccomp',              
+    '--rlimit-cpu=5',         
+    '--rlimit-as=512m',       
+    '--rlimit-nproc=50',      
+    'python3',
+    temp_file_path            # user’s Python file
+],            input=input_str.encode(),
             capture_output=True,
             timeout=10  # Overall timeout in seconds
         )
