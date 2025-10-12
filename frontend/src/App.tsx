@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Editor, { useMonaco } from "@monaco-editor/react";
 import { languageConfigs } from "../lib/langConfig.js"
 import "./App.css"
@@ -50,7 +50,6 @@ function LanguageSelector({ language, onChange }) {
   );
 }
 
-// Code editor component
 function CodeEditor({ language, value, onChange }) {
   const monaco = useMonaco();
   useEditorSetup(monaco, language);
@@ -58,7 +57,7 @@ function CodeEditor({ language, value, onChange }) {
   return (
     <div className="editor-container">
       <Editor
-        height="400px"
+        height="100%"
         theme="vs-dark"
         language={language === "go" ? "go" : language}
         value={value}
@@ -69,29 +68,11 @@ function CodeEditor({ language, value, onChange }) {
           scrollBeyondLastLine: false,
           automaticLayout: true
         }}
-
-
       />
     </div>
   );
 }
 
-// Input panel component
-function InputPanel({ value, onChange }) {
-  return (
-    <div className="input-panel">
-      <label htmlFor="input-area">Program Input (stdin):</label>
-      <textarea
-        id="input-area"
-        placeholder="Enter input for your program..."
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-      />
-    </div>
-  );
-}
-
-// Output panel component
 function OutputPanel({ output }) {
   return (
     <div className="output-panel">
@@ -101,7 +82,6 @@ function OutputPanel({ output }) {
   );
 }
 
-// Submit button component
 function SubmitButton({ onClick, loading, text, loading_text }) {
   return (
     <button
@@ -113,21 +93,57 @@ function SubmitButton({ onClick, loading, text, loading_text }) {
     </button>
   );
 }
-//line ai button
-// function LineAIButton({ onClick, loading }) {
-//   return (
-//     <button
-//       onClick={onClick}
-//       disabled={loading}
-//       className={`submit-btn ${loading ? "loading" : ""}`}
-//     >
-//       {loading ? "Generating..." : "Generate Line AI"}
-//     </button>
-//   );
-// }
 
+function ResizablePanels({ editor, output }) {
+  const [editorWidth, setEditorWidth] = useState(50);
+  const containerRef = useRef(null);
+  const isDragging = useRef(false);
 
-// Main app component
+  const handleMouseDown = () => {
+    isDragging.current = true;
+  };
+
+  const handleMouseUp = () => {
+    isDragging.current = false;
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging.current || !containerRef.current) return;
+
+    const container = containerRef.current;
+    const newWidth = ((e.clientX - container.getBoundingClientRect().left) / container.clientWidth) * 100;
+
+    if (newWidth > 20 && newWidth < 80) {
+      setEditorWidth(newWidth);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, []);
+
+  return (
+    <div className="resizable-container" ref={containerRef}>
+      <div style={{ width: `${editorWidth}%` }} className="panel">
+        {editor}
+      </div>
+      <div
+        className="divider"
+        onMouseDown={handleMouseDown}
+      />
+      <div style={{ width: `${100 - editorWidth}%` }} className="panel">
+        {output}
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [language, setLanguage] = useState("python");
   const [editorContent, setEditorContent] = useState("");
@@ -143,7 +159,6 @@ export default function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           editor_content: editorContent,
-          // input_content: inputContent,
           language: language
         })
       });
@@ -162,30 +177,20 @@ export default function App() {
       setLoading(false);
     }
   };
-  const lineai = async () => {
 
+  const lineai = async () => {
     setLoading(true);
     try {
       const response = await fetch("api/line_ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          code: editorContent,
-          language: language
-        })
+        body: JSON.stringify({ code: editorContent, language })
       });
-
-      if (!response.ok) {
-        const error = await response.json();
-        setOutput(`Error: ${JSON.stringify(error)}`);
-        return;
-      }
-
+      if (!response.ok) throw new Error("Request failed");
       const data = await response.json();
-      console.log(data)
       setEditorContent(data.finished_code);
     } catch (err) {
-      setOutput(`Request failed: ${err.message}`);
+      setOutput(`Error: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -197,109 +202,79 @@ export default function App() {
       const response = await fetch("api/full_ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          code: editorContent,
-          language: language
-        })
+        body: JSON.stringify({ code: editorContent, language })
       });
-
-      if (!response.ok) {
-        const error = await response.json();
-        setOutput(`Error: ${JSON.stringify(error)}`);
-        return;
-      }
-
+      if (!response.ok) throw new Error("Request failed");
       const data = await response.json();
-      console.log(data)
       setEditorContent(data.finished_code);
     } catch (err) {
-      setOutput(`Request failed: ${err.message}`);
+      setOutput(`Error: ${err.message}`);
     } finally {
       setLoading(false);
     }
   };
 
   const bug_fix = async () => {
-
     setLoading(true);
     try {
       const response = await fetch("api/bug_fix", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          code: editorContent,
-          language: language
-        })
+        body: JSON.stringify({ code: editorContent, language })
       });
-
-      if (!response.ok) {
-        const error = await response.json();
-        setOutput(`Error: ${JSON.stringify(error)}`);
-        return;
-      }
-
+      if (!response.ok) throw new Error("Request failed");
       const data = await response.json();
-      console.log(data)
       setEditorContent(data.finished_code);
     } catch (err) {
-      setOutput(`Request failed: ${err.message}`);
+      setOutput(`Error: ${err.message}`);
     } finally {
       setLoading(false);
     }
   };
 
-
+  const explain = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("api/explain", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: editorContent, language })
+      });
+      if (!response.ok) throw new Error("Request failed");
+      const data = await response.json();
+      setOutput(data.finished_code);
+    } catch (err) {
+      setOutput(`Error: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="app">
-      <div className="">
-        <LanguageSelector
-          language={language}
-          onChange={setLanguage}
-        />
-
-        <SubmitButton
-          onClick={handleSubmit}
-          loading={loading}
-          text="Run Code"
-          loading_text="Running..."
-        />
-        <SubmitButton
-          onClick={lineai}
-          loading={loading}
-          text="Generate Line AI"
-          loading_text="Generating..."
-        />
-
-        <SubmitButton
-          onClick={fullai}
-          loading={loading}
-          text="Generate Full AI"
-          loading_text="Generating..."
-        />
-        <SubmitButton
-          onClick={bug_fix}
-          loading={loading}
-          text="Fix Bug"
-          loading_text="Fixing..."
-        />
+      <div className="controls">
+        <LanguageSelector language={language} onChange={setLanguage} />
+        <SubmitButton onClick={handleSubmit} loading={loading} text="Run Code" loading_text="Running..." />
+        <SubmitButton onClick={lineai} loading={loading} text="Generate Line AI" loading_text="Generating..." />
+        <SubmitButton onClick={fullai} loading={loading} text="Generate Full AI" loading_text="Generating..." />
+        <SubmitButton onClick={bug_fix} loading={loading} text="Fix Bug" loading_text="Fixing..." />
+        <SubmitButton onClick={explain} loading={loading} text="Explain Code" loading_text="Loading..." />
       </div>
 
-      <CodeEditor
-        language={language}
-        value={editorContent}
-        onChange={(val) => setEditorContent(val || "")}
+      <ResizablePanels
+        editor={<CodeEditor language={language} value={editorContent} onChange={(val) => setEditorContent(val || "")} />}
+        output={<OutputPanel output={output} />}
       />
 
-      <InputPanel
-        value={inputContent}
-        onChange={setInputContent}
-      />
-
-
-
-
-      <OutputPanel output={output} />
+      <div className="input-panel">
+        <label htmlFor="input-area">Program Input (stdin):</label>
+        <textarea
+          id="input-area"
+          placeholder="Enter input for your program..."
+          value={inputContent}
+          onChange={(e) => setInputContent(e.target.value)}
+        />
+      </div>
     </div>
   );
 }

@@ -3,8 +3,6 @@ from fastapi.responses import HTMLResponse, PlainTextResponse,JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from run import run
-# from line_suggestion import line_ai_agent
-# from full_suggestion import full_ai_agent
 from typing import Dict, List
 from fastapi.middleware.cors import CORSMiddleware
 origins=["localhost:8080","localhost:5173"]
@@ -64,29 +62,17 @@ async def bug_fix(
 
 
 
-#
-#
-# @app.post("/bug_fix", response_class=PlainTextResponse)
-#
-# async def bug_fix(request: Request):
-#     data = await request.json()
-#     code = data.get("code", "")
-#     language = data.get("language", "")
-#     suggestion = call_llm(language=language, code=code,prompt=open("./prompts/bug_fix.txt").read())
-#     return suggestion
-#
-# @app.post("/explain", response_class=PlainTextResponse)
-#
-# async def explain(request: Request):
-#     data = await request.json()
-#     code = data.get("code", "")
-#     language = data.get("language", "")
-#     suggestion = call_llm(language=language, 
-#                                code=code,prompt=open("./prompts/explain.txt").read())
-#     return suggestion
-#
+@app.post("/explain", response_class=PlainTextResponse)
+async def explain(
+    request: Request,
+    data: dict  # Changed to accept JSON
+):
+    data = await request.json()
+    code = data.get("code", "")
+    suggestion = lineai(code=code,system_prompt=open("./prompts/explain.txt").read())
+    return JSONResponse(content=suggestion)
 
-# print("hell")
+
 @app.post("/submit")
 async def submit_editor_content(
     request: Request,

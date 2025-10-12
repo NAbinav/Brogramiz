@@ -7,21 +7,33 @@ from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 import json
-
-def lineai( code, system_prompt):
-    # Initialize Groq LLM
-    class CodeOutput(BaseModel):
-        finished_code: str = Field(description=system_prompt)
-    print(system_prompt)
+#
+# def lineai( code, system_prompt):
+#     # Initialize Groq LLM
+#     class CodeOutput(BaseModel):
+#         finished_code: str = Field(description=system_prompt)
+#     print(system_prompt)
+#     llm = ChatGroq(
+#         model="openai/gpt-oss-120b",
+#         temperature=0.8,
+#         # api_key=API_KEY
+#     )
+#     structured_llm=llm.with_structured_output(CodeOutput)
+#     input=code 
+#     print(code)
+#     return(structured_llm.invoke(input).dict())
+#
+def lineai(code, system_prompt):
     llm = ChatGroq(
         model="openai/gpt-oss-120b",
         temperature=0.8,
-        # api_key=API_KEY
     )
-    structured_llm=llm.with_structured_output(CodeOutput)
-    input=code 
-    print(code)
-    return(structured_llm.invoke(input).dict())
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": code}
+    ]
+    response = llm.invoke(messages)
+    return {"finished_code": response.content}  # Manual parsing
 
 
     # Define JSON parser with schema
