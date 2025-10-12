@@ -3,32 +3,6 @@ from pydantic import BaseModel,Field
 import os
 API_KEY=os.getenv("GROQ_API_KEY")
 client = Groq(api_key=API_KEY)
-def ai(language,code,prompt):
-    completion = client.chat.completions.create(
-        model="openai/gpt-oss-120b",
-        messages=[
-             {
-            "role": "system",
-            "content": prompt 
-          },
-          {
-            "role": "user",
-                "content": "code:"+code+"language:"+language
-          }
-        ],
-        temperature=1,
-        max_completion_tokens=8192,
-        top_p=1,
-        reasoning_effort="low",
-        stream=True,
-        stop=None
-    )
-    out=""
-    for chunk in completion:
-        out+=(chunk.choices[0].delta.content or "")
-    print(type(out))
-    return out
-
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
@@ -45,8 +19,7 @@ def lineai( code, system_prompt):
         # api_key=API_KEY
     )
     structured_llm=llm.with_structured_output(CodeOutput)
-    input=code
-    
+    input=code 
     return(structured_llm.invoke(input).dict())
 
 
@@ -71,4 +44,5 @@ def lineai( code, system_prompt):
     #     return {"suggestion": json.dumps(result, indent=2)}
     #
     # return parse_product(f"code: {code}, language: {language}")
+
 
