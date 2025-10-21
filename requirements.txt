@@ -8,3 +8,4 @@ requests
 websockets
 google-generativeai
 google-genai
+groq
