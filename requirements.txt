@@ -9,3 +9,4 @@ websockets
 google-generativeai
 google-genai
 groq
+langchain_groq

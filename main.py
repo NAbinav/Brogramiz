@@ -2,6 +2,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request, Form
 from fastapi.responses import HTMLResponse, PlainTextResponse,JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.exceptions import HTTPException
 from run import run
 from typing import Dict, List
 from fastapi.middleware.cors import CORSMiddleware
@@ -78,8 +79,8 @@ async def submit_editor_content(
     request: Request,
     data: dict  # Changed to accept JSON
 ):
-    editor_content = data.get("editor_content", "")
-    input_content = data.get("input_content", "")
+    editor_content = data.get("code", "")
+    input_content = data.get("input", "")
     language = data.get("language", "cpp")
     
     if not editor_content:
