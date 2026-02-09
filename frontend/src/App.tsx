@@ -49,7 +49,7 @@ function App() {
   const [roomId, setRoomId] = useState('default-room');
   const [isCollaborative, setIsCollaborative] = useState(false);
   // Default to your local server
-  const [wsUrl, setWsUrl] = useState('ws://localhost:1234');
+  const [wsUrl, setWsUrl] = useState('/yjs');
   const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'connecting' | 'connected'>('disconnected');
   const [connectedUsers, setConnectedUsers] = useState(0);
 
@@ -90,6 +90,14 @@ function App() {
       console.log('WebSocket status:', event.status);
       setConnectionStatus(event.status === 'connected' ? 'connected' : 'disconnected');
     });
+
+    provider.ws.onopen = () => {
+      console.log('[WS] open')
+    }
+
+    provider.ws.onerror = err => {
+      console.error('[WS] error', err)
+    }
 
     // 5. Track User Count (Awareness)
     provider.awareness.on('change', () => {
@@ -278,15 +286,6 @@ function App() {
           </select>
 
           <div className="collaboration-controls">
-            <input
-              type="text"
-              value={wsUrl}
-              onChange={(e) => setWsUrl(e.target.value)}
-              placeholder="WebSocket URL"
-              className="room-input"
-              disabled={isCollaborative}
-              style={{ minWidth: '200px' }}
-            />
             <input
               type="text"
               value={roomId}

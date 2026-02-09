@@ -15,6 +15,12 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
+      '/yjs': {
+        target: 'ws://localhost:1234',
+        ws: true,
+        changeOrigin: true,
+      },
+
     },
   },
 })
