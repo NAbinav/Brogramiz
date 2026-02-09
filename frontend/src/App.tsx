@@ -166,32 +166,10 @@ function App() {
     return editorContent;
   };
 
+  // 1. Simplify toggleCollaboration (just update state)
   const toggleCollaboration = () => {
-    const newState = !isCollaborative;
-    setIsCollaborative(newState);
-
-    if (newState) {
-      // Turning ON collaboration
-      if (editorRef.current) {
-        setupCollaboration(editorRef.current);
-      }
-    } else {
-      // Turning OFF collaboration
-
-      // 1. Save the current collaborative text to local state so it doesn't disappear
-      if (editorRef.current) {
-        setEditorContent(editorRef.current.getValue());
-      } else if (ytextRef.current) {
-        setEditorContent(ytextRef.current.toString());
-      }
-
-      // 2. Disconnect
-      cleanupCollaboration();
-      setConnectionStatus('disconnected');
-      setConnectedUsers(0);
-    }
+    setIsCollaborative(prev => !prev);
   };
-
   const handleLanguageChange = (newLang: string) => {
     setLanguage(newLang);
     // Only reset code if we are NOT collaborating to avoid wiping other users' work
@@ -251,11 +229,27 @@ function App() {
   };
 
   useEffect(() => {
-    // Cleanup on unmount
+    if (!editorRef.current) return;
+
+    if (isCollaborative) {
+      // Start collaboration
+      setupCollaboration(editorRef.current);
+    } else {
+      // Stop collaboration
+      // Save current text to local state before disconnecting so we don't lose it
+      if (editorRef.current) {
+        setEditorContent(editorRef.current.getValue());
+      }
+      cleanupCollaboration();
+      setConnectionStatus('disconnected');
+      setConnectedUsers(0);
+    }
+
+    // Cleanup on unmount or when dependencies change
     return () => {
       cleanupCollaboration();
     };
-  }, []);
+  }, [isCollaborative, roomId]); // Re-run if room changes!
 
   const getStatusIndicator = () => {
     switch (connectionStatus) {
@@ -320,7 +314,7 @@ function App() {
               language={LANGUAGES.find(l => l.id === language)?.monaco || 'python'}
               // Important: When in collab mode, let Yjs manage the value. 
               // When local, use local state.
-              defaultValue={editorContent}
+              defaultValue={DEFAULT_CODE.python}
               value={isCollaborative ? undefined : editorContent}
               onChange={(value) => {
                 if (!isCollaborative) {
