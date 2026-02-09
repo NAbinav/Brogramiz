@@ -28,8 +28,8 @@ async def line_ai(
 ):
     data = await request.json()
     code = data.get("code", "")
-    # language = data.get("language", "")
-    # print(language)
+    language = data.get("language", "")
+    print(language)
     suggestion = lineai(code=code,system_prompt=open("./prompts/line.txt").read())
     print(suggestion)
     return JSONResponse(content=suggestion)
@@ -42,8 +42,8 @@ async def full_ai(
 ):
     data = await request.json()
     code = data.get("code", "")
-    # language = data.get("language", "")
-    # print(language)
+    language = data.get("language", "")
+    print(language)
     suggestion = lineai(code=code,system_prompt=open("./prompts/full.txt").read())
     print(suggestion)
     return JSONResponse(content=suggestion)
@@ -55,8 +55,8 @@ async def bug_fix(
 ):
     data = await request.json()
     code = data.get("code", "")
-    # language = data.get("language", "")
-    # print(language)
+    language = data.get("language", "")
+    print(language)
     suggestion = lineai(code=code,system_prompt=open("./prompts/bug_fix.txt").read())
     print(suggestion)
     return JSONResponse(content=suggestion)
@@ -93,48 +93,48 @@ async def submit_editor_content(
     output = run(input_content, editor_content, language)
     print(output)
     return {"output": output}
-# rooms: Dict[str, Dict[str, any]] = {}
+rooms: Dict[str, Dict[str, any]] = {}
 
-# @app.websocket("/ws/{room_name}")
-# async def websocket_endpoint(websocket: WebSocket, room_name: str):
-#     await websocket.accept()
-#
-#     # Wait for authentication message
-#     try:
-#         auth_message = await websocket.receive_text()
-#         if not auth_message.startswith("AUTH:"):
-#             await websocket.send_text("ERROR:Authentication required.")
-#             await websocket.close()
-#             return
-#         password = auth_message.replace("AUTH:", "").strip()
-#
-#         if room_name not in rooms:
-#             # Create new room
-#             rooms[room_name] = {"code": "", "clients": [], "password": password}
-#         else:
-#             # Check password
-#             if rooms[room_name]["password"] != password:
-#                 await websocket.send_text("ERROR:Invalid room password.")
-#                 await websocket.close()
-#                 return
-#
-#         # Send current code to new user
-#         await websocket.send_text(rooms[room_name]["code"])
-#
-#         # Add client
-#         rooms[room_name]["clients"].append(websocket)
-#
-#         while True:
-#             data = await websocket.receive_text()
-#             # Broadcast to all other clients
-#             rooms[room_name]["code"] = data
-#             for client in rooms[room_name]["clients"]:
-#                 if client != websocket:
-#                     await client.send_text(data)
-#
-#     except WebSocketDisconnect:
-#         print(f"Client disconnected from room {room_name}")
-#     finally:
-#         if not rooms[room_name]["clients"]:
-#             del rooms[room_name]
-#
+@app.websocket("/ws/{room_name}")
+async def websocket_endpoint(websocket: WebSocket, room_name: str):
+    await websocket.accept()
+
+    # Wait for authentication message
+    try:
+        auth_message = await websocket.receive_text()
+        if not auth_message.startswith("AUTH:"):
+            await websocket.send_text("ERROR:Authentication required.")
+            await websocket.close()
+            return
+        password = auth_message.replace("AUTH:", "").strip()
+
+        if room_name not in rooms:
+            # Create new room
+            rooms[room_name] = {"code": "", "clients": [], "password": password}
+        else:
+            # Check password
+            if rooms[room_name]["password"] != password:
+                await websocket.send_text("ERROR:Invalid room password.")
+                await websocket.close()
+                return
+
+        # Send current code to new user
+        await websocket.send_text(rooms[room_name]["code"])
+
+        # Add client
+        rooms[room_name]["clients"].append(websocket)
+
+        while True:
+            data = await websocket.receive_text()
+            # Broadcast to all other clients
+            rooms[room_name]["code"] = data
+            for client in rooms[room_name]["clients"]:
+                if client != websocket:
+                    await client.send_text(data)
+
+    except WebSocketDisconnect:
+        print(f"Client disconnected from room {room_name}")
+    finally:
+        if not rooms[room_name]["clients"]:
+            del rooms[room_name]
+

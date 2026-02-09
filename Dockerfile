@@ -27,7 +27,19 @@ ENV PATH="/venv/bin:$PATH"
 
 COPY . .
 
-EXPOSE 8080
+WORKDIR /app/frontend
+RUN npm install
+
+WORKDIR /app
+
+CMD ["sh", "-c", "\
+dockerd & \
+sleep 5 && echo 'Docker daemon started' && \
+cd frontend && npm run dev & \
+cd /app && uvicorn app:app --host 0.0.0.0 --port 8080 \
+"]
+
+EXPOSE 8080 5173
 
 ENV DOCKER_HOST="unix:///var/run/docker.sock"
 
